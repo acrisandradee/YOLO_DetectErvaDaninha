@@ -1,0 +1,29 @@
+# Ambientes virtuais
+.venv/
+env/
+venv/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Cache Python
+__pycache__/
+*.py[cod]
+
+# Modelos e pesos
+*.pt
+*.pth
+runs/
+
+# Dados grandes
+data/
+outputs/
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+*.bak
