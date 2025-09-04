@@ -11,14 +11,6 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 
-# Modelos e pesos
-*.pt
-*.pth
-runs/
-
-# Dados grandes
-data/
-outputs/
 
 # Jupyter/IPython
 .ipynb_checkpoints/
