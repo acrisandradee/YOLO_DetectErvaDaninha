@@ -1,72 +1,104 @@
-# app_streamlit.py (VERSÃO CORRIGIDA)
-
 import streamlit as st
 import cv2
 from ultralytics import YOLO
 from pathlib import Path
 import numpy as np
 
-# -------------------------------
-# Configurações iniciais
-# -------------------------------
-st.set_page_config(page_title="Detector de Ervas Daninhas", layout="centered")
+st.set_page_config(
+    page_title="Detector de Ervas Daninhas",
+    page_icon="🌿",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# --- CORREÇÃO PRINCIPAL ---
-# O caminho para o modelo deve ser relativo à raiz do repositório.
-# Linha CORRIGIDA
 weights_path = "runs/detect/treinamento_ervas_final/weights/best.pt"
-
-# Lista de classes do modelo (ajuste se tiver mais de uma)
 classes = ["erva daninha"]
 
-# Função para carregar o modelo (com cache para melhor performance)
 @st.cache_resource
 def load_yolo_model(path):
-    """Carrega o modelo YOLO a partir de um caminho."""
-    # Verifica se o arquivo do modelo existe antes de carregar
     if not Path(path).exists():
         st.error(f"Arquivo do modelo não encontrado em: {path}")
         st.stop()
     modelo = YOLO(path)
     return modelo
 
-# Carregar modelo treinado
+
 modelo = load_yolo_model(weights_path)
 
-# -------------------------------
-# Interface do Streamlit
-# -------------------------------
-st.title("🌱 Detector de Ervas Daninhas")
-st.markdown("Faça upload de uma imagem para verificar se o modelo consegue identificar ervas daninhas.")
 
-# Upload de imagem
-uploaded_file = st.file_uploader("Escolha uma imagem", type=["jpg", "jpeg", "png"])
+st.sidebar.title("Painel de Controle 🛠️")
+st.sidebar.markdown("Ajuste os parâmetros e faça o upload da sua imagem.")
+
+confidence_threshold = st.sidebar.slider(
+    "Nível de Confiança da Detecção", 
+    min_value=0.0, 
+    max_value=1.0, 
+    value=0.5,  
+    step=0.05
+)
+st.sidebar.markdown("---")
+
+uploaded_file = st.sidebar.file_uploader(
+    "Escolha uma imagem para análise", 
+    type=["jpg", "jpeg", "png"]
+)
+
+st.title("🌿 Detector Inteligente de Ervas Daninhas")
+st.markdown(
+    "Faça o upload de uma imagem do seu jardim ou plantação e nossa IA fará a detecção de ervas daninhas em segundos!"
+)
 
 if uploaded_file is not None:
-    # Lê imagem enviada
+   
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     img_bgr = cv2.imdecode(file_bytes, 1)
+    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
-    # Faz predição
-    results = modelo.predict(source=img_bgr, conf=0.5, save=False)
 
-    # Mostra resultados
-    for r in results:
-        # Forçar nomes das classes para exibição nas bounding boxes
-        r.names = {0: "erva daninha"} # Garante que a classe 0 sempre seja "erva daninha"
-        im_bgr_plot = r.plot()  # imagem com bounding boxes em BGR
-        im_rgb_plot = cv2.cvtColor(im_bgr_plot, cv2.COLOR_BGR2RGB) # Converte para RGB para exibição
-        
-        st.image(im_rgb_plot, caption="Resultado da Detecção", use_column_width=True)
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Imagem Original")
+        st.image(img_rgb, use_column_width=True)
 
-        # Exibir detalhes da predição
-        if len(r.boxes) > 0:
-            st.subheader("📋 Detalhes da Predição")
+   
+    with st.spinner("Analisando a imagem... "):
+        results = modelo.predict(source=img_bgr, conf=confidence_threshold, save=False)
+        r = results[0] 
+
+        im_bgr_plot = r.plot()
+        im_rgb_plot = cv2.cvtColor(im_bgr_plot, cv2.COLOR_BGR2RGB)
+
+    with col2:
+        st.subheader("Resultado da Detecção")
+        st.image(im_rgb_plot, use_column_width=True)
+
+    st.markdown("---")
+    
+
+    if len(r.boxes) > 0:
+        with st.expander("Clique para ver os detalhes da predição "):
             boxes = r.boxes
+            st.write(f"**Total de detecções:** {len(boxes)}")
             for i, box in enumerate(boxes):
                 cls_id = int(box.cls[0])
                 conf = float(box.conf[0])
                 class_name = classes[cls_id]
-                st.write(f"- Objeto {i+1}: Classe **{class_name}**, Confiança: **{conf:.2f}**")
-        else:
-            st.success("✅ Nenhuma erva daninha detectada na imagem!")
+                st.write(f"- **Objeto {i+1}:** Classe `{class_name}`, Confiança: `{conf:.2f}`")
+    else:
+        st.success("✅ Nenhuma erva daninha detectada com o nível de confiança atual!")
+
+else:
+    
+    st.info("Aguardando o upload de uma imagem pela barra lateral.")
+    
+
+st.markdown("---")
+st.markdown(
+    """
+    <div style="text-align: center; color: grey;">
+        <p>🌱 Software desenvolvido por <strong>Cristina Andrade</strong></p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
