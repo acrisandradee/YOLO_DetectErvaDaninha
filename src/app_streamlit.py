@@ -4,6 +4,7 @@ from ultralytics import YOLO
 from pathlib import Path
 import numpy as np
 
+# --- CONFIGURAÇÕES DA PÁGINA ---
 st.set_page_config(
     page_title="Detector de Ervas Daninhas",
     page_icon="🌿",
@@ -11,6 +12,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- CARREGAMENTO DO MODELO ---
 weights_path = "runs/detect/treinamento_ervas_final/weights/best.pt"
 classes = ["erva daninha"]
 
@@ -24,8 +26,9 @@ def load_yolo_model(path):
 
 modelo = load_yolo_model(weights_path)
 
+
 st.sidebar.title("Painel de Controle ")
-st.sidebar.markdown("Ajuste os parâmetros e faça o upload da sua imagem.")
+st.sidebar.markdown("Ajuste os parâmetros de detecção.")
 
 confidence_threshold = st.sidebar.slider(
     "Nível de Confiança da Detecção", 
@@ -34,16 +37,16 @@ confidence_threshold = st.sidebar.slider(
     value=0.5,  
     step=0.05
 )
-st.sidebar.markdown("---")
-
-uploaded_file = st.sidebar.file_uploader(
-    "Escolha uma imagem para análise", 
-    type=["jpg", "jpeg", "png"]
-)
 
 st.title("🌿 Detector Inteligente de Ervas Daninhas")
 st.markdown(
     "Faça o upload de uma imagem do seu jardim ou plantação e nossa IA fará a detecção de ervas daninhas."
+)
+
+
+uploaded_file = st.file_uploader(
+    "Selecione uma imagem para análise", 
+    type=["jpg", "jpeg", "png"]
 )
 
 if uploaded_file is not None:
@@ -51,6 +54,7 @@ if uploaded_file is not None:
     img_bgr = cv2.imdecode(file_bytes, 1)
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
+    st.markdown("---")
     col1, col2 = st.columns(2)
     
     with col1:
@@ -68,8 +72,6 @@ if uploaded_file is not None:
         st.subheader("Resultado da Detecção")
         st.image(im_rgb_plot, use_container_width=True)
 
-    st.markdown("---")
-    
     if len(r.boxes) > 0:
         with st.expander("Clique para ver os detalhes da predição 👇"):
             boxes = r.boxes
@@ -83,8 +85,9 @@ if uploaded_file is not None:
         st.success("✅ Nenhuma erva daninha detectada com o nível de confiança atual!")
 
 else:
-    st.info("Aguardando o upload de uma imagem pela barra lateral.")
+    st.info("Aguardando o upload de uma imagem.")
     
+# --- RODAPÉ ---
 st.markdown("---")
 st.markdown(
     """
