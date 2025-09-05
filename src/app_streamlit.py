@@ -87,7 +87,7 @@ if uploaded_file is not None:
 else:
     st.info("Aguardando o upload de uma imagem.")
     
-# --- RODAPÉ ---
+
 st.markdown("---")
 st.markdown(
     """
