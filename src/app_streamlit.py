@@ -4,11 +4,12 @@ from ultralytics import YOLO
 from pathlib import Path
 import numpy as np
 
+
 st.set_page_config(
     page_title="Detector de Ervas Daninhas",
     page_icon="https://raw.githubusercontent.com/acrisandradee/YOLO_DetectErvaDaninha/main/logo.png",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto"  # 'auto' é melhor para responsividade
 )
 
 weights_path = "runs/detect/treinamento_ervas_final/weights/best.pt"
@@ -24,8 +25,9 @@ def load_yolo_model(path):
 
 modelo = load_yolo_model(weights_path)
 
-st.sidebar.title("Painel de Controle 🛠️")
-st.sidebar.markdown("Ajuste os parâmetros de detecção.")
+
+st.sidebar.title("Painel de Controle ")
+st.sidebar.markdown("Ajuste os parâmetros e faça o upload da sua imagem.")
 
 confidence_threshold = st.sidebar.slider(
     "Nível de Confiança da Detecção", 
@@ -35,14 +37,19 @@ confidence_threshold = st.sidebar.slider(
     step=0.05
 )
 
-st.title("🌿 Detector Inteligente de Ervas Daninhas")
+uploaded_file = st.sidebar.file_uploader(
+    "Escolha uma imagem para análise", 
+    type=["jpg", "jpeg", "png"]
+)
+st.sidebar.markdown("---")
+col1, col2 = st.columns([1, 5], gap="medium")
+with col1:
+    st.image("https://raw.githubusercontent.com/acrisandradee/YOLO_DetectErvaDaninha/main/logo.png", width=100)
+with col2:
+    st.title("Detector Inteligente de Ervas Daninhas")
+
 st.markdown(
     "Faça o upload de uma imagem do seu jardim ou plantação e nossa IA fará a detecção de ervas daninhas."
-)
-
-uploaded_file = st.file_uploader(
-    "Selecione uma imagem para análise", 
-    type=["jpg", "jpeg", "png"]
 )
 
 if uploaded_file is not None:
@@ -51,13 +58,13 @@ if uploaded_file is not None:
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
     st.markdown("---")
-    col1, col2 = st.columns(2)
+    res_col1, res_col2 = st.columns(2)
     
-    with col1:
+    with res_col1:
         st.subheader("Imagem Original")
         st.image(img_rgb, use_container_width=True)
 
-    with st.spinner("Analisando a imagem... "):
+    with st.spinner("Analisando a imagem..."):
         results = modelo.predict(source=img_bgr, conf=confidence_threshold, save=False)
         r = results[0] 
 
@@ -66,7 +73,7 @@ if uploaded_file is not None:
         im_bgr_plot = r.plot()
         im_rgb_plot = cv2.cvtColor(im_bgr_plot, cv2.COLOR_BGR2RGB)
 
-    with col2:
+    with res_col2:
         st.subheader("Resultado da Detecção")
         st.image(im_rgb_plot, use_container_width=True)
 
@@ -84,8 +91,9 @@ if uploaded_file is not None:
         st.success("✅ Nenhuma erva daninha detectada com o nível de confiança atual!")
 
 else:
-    st.info("Aguardando o upload de uma imagem.")
+    st.info("⬅️ Por favor, utilize o menu lateral para fazer o upload de uma imagem.")
     
+
 st.markdown("---")
 st.markdown(
     """
