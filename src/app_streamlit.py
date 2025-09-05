@@ -22,9 +22,7 @@ def load_yolo_model(path):
     modelo = YOLO(path)
     return modelo
 
-
 modelo = load_yolo_model(weights_path)
-
 
 st.sidebar.title("Painel de Controle 🛠️")
 st.sidebar.markdown("Ajuste os parâmetros e faça o upload da sua imagem.")
@@ -45,24 +43,21 @@ uploaded_file = st.sidebar.file_uploader(
 
 st.title("🌿 Detector Inteligente de Ervas Daninhas")
 st.markdown(
-    "Faça o upload de uma imagem do seu jardim ou plantação e nossa IA fará a detecção de ervas daninhas em segundos!"
+    "Faça o upload de uma imagem do seu jardim ou plantação e nossa IA fará a detecção de ervas daninhas."
 )
 
 if uploaded_file is not None:
-   
     file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
     img_bgr = cv2.imdecode(file_bytes, 1)
     img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-
 
     col1, col2 = st.columns(2)
     
     with col1:
         st.subheader("Imagem Original")
-        st.image(img_rgb, use_column_width=True)
+        st.image(img_rgb, use_container_width=True)
 
-   
-    with st.spinner("Analisando a imagem... "):
+    with st.spinner("Analisando a imagem... 🧐"):
         results = modelo.predict(source=img_bgr, conf=confidence_threshold, save=False)
         r = results[0] 
 
@@ -71,13 +66,12 @@ if uploaded_file is not None:
 
     with col2:
         st.subheader("Resultado da Detecção")
-        st.image(im_rgb_plot, use_column_width=True)
+        st.image(im_rgb_plot, use_container_width=True)
 
     st.markdown("---")
     
-
     if len(r.boxes) > 0:
-        with st.expander("Clique para ver os detalhes da predição "):
+        with st.expander("Clique para ver os detalhes da predição 👇"):
             boxes = r.boxes
             st.write(f"**Total de detecções:** {len(boxes)}")
             for i, box in enumerate(boxes):
@@ -89,10 +83,8 @@ if uploaded_file is not None:
         st.success("✅ Nenhuma erva daninha detectada com o nível de confiança atual!")
 
 else:
-    
     st.info("Aguardando o upload de uma imagem pela barra lateral.")
     
-
 st.markdown("---")
 st.markdown(
     """
