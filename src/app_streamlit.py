@@ -7,7 +7,7 @@ import numpy as np
 # --- CONFIGURAÇÕES DA PÁGINA ---
 st.set_page_config(
     page_title="Detector de Ervas Daninhas",
-    page_icon="🌿",
+    page_icon="https://github.com/acrisandradee/YOLO_DetectErvaDaninha/blob/main/logo.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
