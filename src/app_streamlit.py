@@ -14,7 +14,7 @@ st.set_page_config(page_title="Detector de Ervas Daninhas", layout="centered")
 # --- CORREÇÃO PRINCIPAL ---
 # O caminho para o modelo deve ser relativo à raiz do repositório.
 # Linha CORRIGIDA
-weights_path = "runs/detect/treinamento_ervas_final/weeds/best.pt"
+weights_path = "runs/detect/treinamento_ervas_final/weights/best.pt"
 
 # Lista de classes do modelo (ajuste se tiver mais de uma)
 classes = ["erva daninha"]
