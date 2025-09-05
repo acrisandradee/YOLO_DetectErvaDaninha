@@ -24,7 +24,7 @@ def load_yolo_model(path):
 
 modelo = load_yolo_model(weights_path)
 
-st.sidebar.title("Painel de Controle 🛠️")
+st.sidebar.title("Painel de Controle ")
 st.sidebar.markdown("Ajuste os parâmetros e faça o upload da sua imagem.")
 
 confidence_threshold = st.sidebar.slider(
@@ -57,7 +57,7 @@ if uploaded_file is not None:
         st.subheader("Imagem Original")
         st.image(img_rgb, use_container_width=True)
 
-    with st.spinner("Analisando a imagem... 🧐"):
+    with st.spinner("Analisando a imagem... "):
         results = modelo.predict(source=img_bgr, conf=confidence_threshold, save=False)
         r = results[0] 
 
